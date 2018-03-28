@@ -2,9 +2,17 @@ import * as React from 'react';
 import './App.css';
 const Container = require('react-with-state-props').Container;
 
-type State = object;
+interface Props {
+  [name: string]: any;
+}
+
 interface Item {
-  title: 'string';
+  title: string;
+}
+
+interface AppState {
+  items: object;
+  newItem: Item;
 }
 
 const state: State = {
