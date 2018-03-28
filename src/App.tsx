@@ -1,4 +1,5 @@
 import * as React from 'react';
+import db from './mockDb';
 import './App.css';
 const Container = require('react-with-state-props').Container;
 
@@ -21,15 +22,6 @@ const newItem = {
   title: ''
 };
 
-function createItem(item: {}) {
-  return {
-    [rando()]: {
-      ...item,
-      done: 0
-    }
-  };
-}
-
 // STATE
 
 const state: Props = {
@@ -43,12 +35,24 @@ const deriveState = [
     derive: ({ newItem }: Props) => ({
       isValid: Boolean(newItem.title.trim())
     })
+  },
+  {
+    onStateChange: 'items',
+    derive: ({ items }: Props) => {
+      const itemList = Object.keys(items).map(key => ({
+        ...items[key],
+        id: key
+      }));
+      return {
+        itemList: itemList.sort((a, b) => b.ts - a.ts)
+      };
+    }
   }
 ];
 
 const withHandlers = {
-  mergeItems: ({ setItems, items }: Props) => (newItems: Props) => {
-    setItems({ ...items, ...newItems });
+  syncItems: ({ setItems }: Props) => () => {
+    db.syncItems(setItems);
   },
   mergeNewItem: ({ setNewItem, newItem }: Props) => (changes: Props) => {
     setNewItem({ ...newItem, ...changes });
@@ -59,10 +63,10 @@ const withHandlers = {
   reset: ({ setNewItem }: Props) => () => {
     setNewItem(newItem);
   },
-  submit: ({ newItem, mergeItems, reset, isValid }: Props) => (e: any) => {
+  submit: ({ newItem, reset, isValid }: Props) => (e: any) => {
     e.preventDefault();
     if (isValid) {
-      mergeItems(createItem(newItem));
+      db.addItem(newItem);
       reset();
     }
   }
@@ -81,21 +85,36 @@ const Form = (props: Props) => {
   );
 };
 
+const Item = (props: Props) => {
+  const { title } = props;
+  return <div>{title}</div>;
+};
+
+class Items extends React.Component<any, any> {
+  componentDidMount() {
+    this.props.syncItems();
+  }
+  render() {
+    const { itemList } = this.props;
+    return (
+      <div>
+        <Form {...this.props} />
+        {itemList.map((item: Props) => <Item key={item.id} {...item} />)}
+      </div>
+    );
+  }
+}
+
 const App = (props: AppState) => {
+  // console.log(props);
   return (
     <div className="App">
-      <Form {...props} />
+      <Items {...props} />
     </div>
   );
 };
 
-const omitProps = [
-  'setItems',
-  'mergeItems',
-  'setNewItem',
-  'mergeNewItem',
-  'reset'
-];
+const omitProps = ['items', 'setItems', 'setNewItem', 'mergeNewItem', 'reset'];
 
 const AppContainer = () => (
   <Container
@@ -108,9 +127,3 @@ const AppContainer = () => (
 );
 
 export default AppContainer;
-
-// Helpers
-
-function rando() {
-  return Math.floor(Math.random() * Math.floor(99999)) + '';
-}
