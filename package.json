@@ -1,5 +1,6 @@
 {
-  "name": "inception-react",
+  "name": "todo-app",
+  "description": "example app using react-with-state-props",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
