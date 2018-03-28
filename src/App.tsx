@@ -21,6 +21,15 @@ const newItem = {
   title: ''
 };
 
+function createItem(item: {}) {
+  return {
+    [rando()]: {
+      ...item,
+      done: 0
+    }
+  };
+}
+
 // STATE
 
 const state: Props = {
@@ -28,7 +37,19 @@ const state: Props = {
   newItem
 };
 
+const deriveState = [
+  {
+    onStateChange: 'newItem',
+    derive: ({ newItem }: Props) => ({
+      isValid: Boolean(newItem.title.trim())
+    })
+  }
+];
+
 const withHandlers = {
+  mergeItems: ({ setItems, items }: Props) => (newItems: Props) => {
+    setItems({ ...items, ...newItems });
+  },
   mergeNewItem: ({ setNewItem, newItem }: Props) => (changes: Props) => {
     setNewItem({ ...newItem, ...changes });
   },
@@ -38,10 +59,12 @@ const withHandlers = {
   reset: ({ setNewItem }: Props) => () => {
     setNewItem(newItem);
   },
-  submit: ({ newItem, reset }: Props) => (e: any) => {
+  submit: ({ newItem, mergeItems, reset, isValid }: Props) => (e: any) => {
     e.preventDefault();
-    // todo: validate newItem and add to state
-    reset();
+    if (isValid) {
+      mergeItems(createItem(newItem));
+      reset();
+    }
   }
 };
 
@@ -66,14 +89,28 @@ const App = (props: AppState) => {
   );
 };
 
-const omitProps = ['setItems', 'setNewItem', 'mergeNewItem', 'reset'];
+const omitProps = [
+  'setItems',
+  'mergeItems',
+  'setNewItem',
+  'mergeNewItem',
+  'reset'
+];
+
 const AppContainer = () => (
   <Container
     state={state}
-    render={App}
+    deriveState={deriveState}
     withHandlers={withHandlers}
     omitProps={omitProps}
+    render={App}
   />
 );
 
 export default AppContainer;
+
+// Helpers
+
+function rando() {
+  return Math.floor(Math.random() * Math.floor(99999)) + '';
+}
