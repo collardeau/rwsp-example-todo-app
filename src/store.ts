@@ -48,9 +48,9 @@ const deriveState = [
 
 const withHandlers = {
   syncItems: ({ setItems, setItemsTs }: Props) => () => {
-    db.syncItems((items: object) => {
+    db.syncItems((items: object, timestamp: number) => {
       setItems(items);
-      setItemsTs(Date.now());
+      setItemsTs(timestamp);
     });
   },
   toggleDone: ({ items }: Props) => (id: string) => {
