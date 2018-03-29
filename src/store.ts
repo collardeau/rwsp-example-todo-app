@@ -44,20 +44,20 @@ const withHandlers = {
   changeTitle: ({ mergeNewItem }: State) => (e: any) => {
     mergeNewItem({ title: e.target.value });
   },
-  reset: ({ setNewItem }: State) => () => {
-    setNewItem(newItem);
-  },
-  submit: ({ newItem, reset, isValid }: State) => (e: any) => {
+  submit: ({ newItem, reset, isValid, setNewItem }: State) => (e: any) => {
     e.preventDefault();
     if (isValid) {
       db.addItem(newItem);
-      reset();
+      setNewItem(newItem);
     }
   }
 };
 
+const omitProps = ['items', 'setItems', 'setNewItem', 'mergeNewItem'];
+
 export default {
   state,
   deriveState,
-  withHandlers
+  withHandlers,
+  omitProps
 };

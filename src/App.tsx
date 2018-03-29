@@ -27,9 +27,7 @@ const App = (props: AppState) => {
   );
 };
 
-const omitProps = ['items', 'setItems', 'setNewItem', 'mergeNewItem', 'reset'];
-
-const { state, deriveState, withHandlers } = store;
+const { state, deriveState, withHandlers, omitProps } = store;
 const AppContainer = () => (
   <Container
     state={state}
