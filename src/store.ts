@@ -1,28 +1,37 @@
 import db from './mockDb';
 
-interface State {
+interface Props {
   [name: string]: any;
 }
 
-const newItem = {
+interface Item {
+  title: string;
+}
+
+interface State {
+  items: { [id: string]: Item };
+  newItem: Item;
+}
+
+const newItemDefault: Item = {
   title: ''
 };
 
 const state: State = {
   items: {},
-  newItem
+  newItem: newItemDefault
 };
 
 const deriveState = [
   {
     onStateChange: 'newItem',
-    derive: ({ newItem }: State) => ({
+    derive: ({ newItem }: Props) => ({
       isValid: Boolean(newItem.title.trim())
     })
   },
   {
     onStateChange: 'items',
-    derive: ({ items }: State) => {
+    derive: ({ items }: Props) => {
       const itemList = Object.keys(items).map(key => ({
         ...items[key],
         id: key
@@ -35,20 +44,20 @@ const deriveState = [
 ];
 
 const withHandlers = {
-  syncItems: ({ setItems }: State) => () => {
+  syncItems: ({ setItems }: Props) => () => {
     db.syncItems(setItems);
   },
-  mergeNewItem: ({ setNewItem, newItem }: State) => (changes: State) => {
+  mergeNewItem: ({ setNewItem, newItem }: Props) => (changes: Props) => {
     setNewItem({ ...newItem, ...changes });
   },
-  changeTitle: ({ mergeNewItem }: State) => (e: any) => {
+  changeTitle: ({ mergeNewItem }: Props) => (e: any) => {
     mergeNewItem({ title: e.target.value });
   },
-  submit: ({ newItem, reset, isValid, setNewItem }: State) => (e: any) => {
+  submit: ({ newItem, reset, isValid, setNewItem }: Props) => (e: any) => {
     e.preventDefault();
     if (isValid) {
       db.addItem(newItem);
-      setNewItem(newItem);
+      setNewItem(newItemDefault);
     }
   }
 };

@@ -14,12 +14,12 @@ interface Item {
 }
 
 interface AppState {
-  items: object;
+  items: { [id: string]: Item };
   newItem: Item;
 }
 
 const App = (props: AppState) => {
-  console.log(props);
+  // console.log(props);
   return (
     <div className="App">
       <Items {...props} />
