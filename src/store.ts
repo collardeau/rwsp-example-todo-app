@@ -53,6 +53,11 @@ const withHandlers = {
       setItemsTs(Date.now());
     });
   },
+  toggleDone: ({ items }: Props) => (id: string) => {
+    db.updateItem(id, {
+      done: !items[id].done
+    });
+  },
   mergeNewItem: ({ setNewItem, newItem }: Props) => (changes: Props) => {
     setNewItem({ ...newItem, ...changes });
   },

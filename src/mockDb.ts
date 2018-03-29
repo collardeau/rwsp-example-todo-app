@@ -7,7 +7,7 @@ const createItem = (item: {}) => {
   return {
     [id]: {
       ...item,
-      done: 0,
+      done: false,
       ts: Date.now()
     }
   };
@@ -33,14 +33,22 @@ function addItem(item: object) {
     ...db.items,
     ...createItem(item)
   };
-  if (updateItems) {
-    setTimeout(() => {
-      updateItems(db.items);
-    });
-  }
+  updateItems && updateItems(db.items);
+}
+
+function updateItem(id: string, changes: object) {
+  db.items = {
+    ...db.items,
+    [id]: {
+      ...db.items[id],
+      ...changes
+    }
+  };
+  updateItems && updateItems(db.items);
 }
 
 export default {
   syncItems,
-  addItem
+  addItem,
+  updateItem
 };

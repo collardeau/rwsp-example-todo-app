@@ -16,8 +16,19 @@ const Form = (props: Props) => {
 };
 
 const Item = (props: Props) => {
-  const { title } = props;
-  return <div>{title}</div>;
+  const { title, done, id, toggle } = props;
+  return (
+    <div>
+      <input
+        checked={done}
+        type="checkbox"
+        onChange={() => {
+          toggle(id);
+        }}
+      />
+      <span style={{ textDecoration: done && 'line-through' }}>{title}</span>
+    </div>
+  );
 };
 
 class Items extends React.Component<any, any> {
@@ -25,12 +36,14 @@ class Items extends React.Component<any, any> {
     this.props.syncItems();
   }
   render() {
-    const { itemList, itemsLoaded } = this.props;
+    const { itemList, itemsLoaded, toggleDone } = this.props;
     if (!itemsLoaded) return <div>Loading...</div>;
     return (
       <div>
         <Form {...this.props} />
-        {itemList.map((item: Props) => <Item key={item.id} {...item} />)}
+        {itemList.map((item: Props) => (
+          <Item key={item.id} {...item} toggle={toggleDone} />
+        ))}
       </div>
     );
   }
