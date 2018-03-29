@@ -10,6 +10,7 @@ interface Item {
 
 interface State {
   items: { [id: string]: Item };
+  itemsTs: number;
   newItem: Item;
 }
 
@@ -19,6 +20,7 @@ const newItemDefault: Item = {
 
 const state: State = {
   items: {},
+  itemsTs: 0,
   newItem: newItemDefault
 };
 
@@ -30,22 +32,26 @@ const deriveState = [
     })
   },
   {
-    onStateChange: 'items',
-    derive: ({ items }: Props) => {
+    onStateChange: 'itemsTs',
+    derive: ({ items, itemsTs }: Props) => {
       const itemList = Object.keys(items).map(key => ({
         ...items[key],
         id: key
       }));
       return {
-        itemList: itemList.sort((a, b) => b.ts - a.ts)
+        itemList: itemList.sort((a, b) => b.ts - a.ts),
+        itemsLoaded: Boolean(itemsTs)
       };
     }
   }
 ];
 
 const withHandlers = {
-  syncItems: ({ setItems }: Props) => () => {
-    db.syncItems(setItems);
+  syncItems: ({ setItems, setItemsTs }: Props) => () => {
+    db.syncItems((items: object) => {
+      setItems(items);
+      setItemsTs(Date.now());
+    });
   },
   mergeNewItem: ({ setNewItem, newItem }: Props) => (changes: Props) => {
     setNewItem({ ...newItem, ...changes });
