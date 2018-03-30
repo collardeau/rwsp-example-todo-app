@@ -18,13 +18,15 @@ let db: Db = {
 };
 
 // mock firebase sync
-let updateDbItems: Function = () => {};
+let refreshItems: Function;
 
-function syncItems(onItems: Function) {
-  updateDbItems = (items: object) => onItems(items, Date.now());
-  setTimeout(() => {
-    updateDbItems(db.items);
-  }, 500);
+function syncItems(cb: Function) {
+  refreshItems = (delay: number = 0) => {
+    setTimeout(() => {
+      cb(db.items, Date.now());
+    }, delay);
+  };
+  refreshItems(500);
 }
 
 function addItem(item: object) {
@@ -32,7 +34,7 @@ function addItem(item: object) {
     ...db.items,
     ...createItem(item)
   };
-  updateDbItems(db.items);
+  refreshItems();
 }
 
 function updateItem(id: string, changes: object) {
@@ -43,7 +45,7 @@ function updateItem(id: string, changes: object) {
       ...changes
     }
   };
-  updateDbItems(db.items);
+  refreshItems(db.items);
 }
 
 export default {
