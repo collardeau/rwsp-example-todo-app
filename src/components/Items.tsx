@@ -36,8 +36,8 @@ class Items extends React.Component<any, any> {
     this.props.syncItems();
   }
   render() {
-    const { itemList, itemsLoaded, toggleDone } = this.props;
-    if (!itemsLoaded) return <div>Loading...</div>;
+    const { itemList, itemsTs: loaded, toggleDone } = this.props;
+    if (!loaded) return <div>Loading...</div>;
     return (
       <div>
         <Form {...this.props} />

@@ -39,8 +39,7 @@ const deriveState = [
         id: key
       }));
       return {
-        itemList: itemList.sort((a, b) => b.ts - a.ts),
-        itemsLoaded: Boolean(itemsTs)
+        itemList: itemList.sort((a, b) => b.ts - a.ts)
       };
     }
   }
